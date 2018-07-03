@@ -9,7 +9,6 @@ private:
 	double inclinareTun;
 	double rotireTank;
 public:
-	//Camera cam;
 	Tank(double a, double b, double c, double rt, double it,double rotireTank);
 	Tank();
 	void setRotireTun(double);

@@ -3,23 +3,24 @@
 #include "Tank.h"
 #include "Ghiulea.h"
 #include "Racheta.h"
-#include "Common.h"
 #include "Camera.h"
+
+#define PI 3.14159265
+
 Tank tank(0, 1, 0, 180, 0, 0);
 Ghiulea *ghiulea = new Ghiulea[100];
-Racheta racheta;
-Camera cam();
+Racheta racheta(0, -2, 0, 0, 0);
+
+int refreshMills = 8;
 int camera = 1;
 int g = 0;
-double xcOffset = 0, zcOffset = 0;
-#define PI 3.14159265
-// angle of rotation for the camera direction
+
 float angle = 0;
-// actual vector representing the camera's direction
 float lx = 0.0f, lz = -1.0f, ly = 0.0f;
-// XZ position of the camera
 float xc = 0.0f, zc = 10.0f, yc = 3.0f;
-int refreshMills = 8;
+double xcOffset = 0, zcOffset = 0;
+
+
 void timer(int value) {
 	glutPostRedisplay();      // Post re-paint request to activate display()
 	glutTimerFunc(refreshMills, timer, 0); // next timer call milliseconds later
@@ -39,7 +40,6 @@ void menu(int selection)
 
 void changeSize(int w, int h)
 {
-
 	// Prevent a divide by zero, when window is too short
 	// (you cant make a window of zero width).
 	if (h == 0)
@@ -63,8 +63,8 @@ void changeSize(int w, int h)
 }
 
 
-void drawTree() {
-
+void drawTree()
+{
 	// Draw Body
 	glColor3f(0.57, 0.38, 0);
 	glPushMatrix();
@@ -76,8 +76,6 @@ void drawTree() {
 	glColor3f(0, 0.6, 0);
 	glTranslatef(0.0f, 3.0f, 0.0f);
 	glutSolidSphere(1, 20, 20);
-
-
 }
 
 void primavara()
@@ -91,18 +89,21 @@ void primavara()
 	glVertex3f(100.0f, 0.0f, -100.0f);
 	glEnd();
 
-	// Draw 36 SnowMen
-	for (int i = -3; i < 3; i++)
-		for (int j = -3; j < 3; j++) {
-			glPushMatrix();
-			glTranslatef(i*10.0, 0, j * 10.0);
-			drawTree();
-			glPopMatrix();
+	// Draw 36 Trees
+	for (int i = -2; i < 3; i++)
+		for (int j = -2; j < 3; j++) {
+			if (i != 0 && j != 0)
+			{
+				glPushMatrix();
+				glTranslatef(i*10.0, 0, j * 10.0);
+				drawTree();
+				glPopMatrix();
+			}
 		}
 }
 
-void drawSnowMan() {
-
+void drawSnowMan()
+{
 	glColor3f(1.0f, 1.0f, 1.0f);
 
 	// Draw Body
@@ -133,22 +134,27 @@ void iarna()
 	// Draw ground
 	glColor3f(0.9f, 0.9f, 0.9f);
 	glBegin(GL_QUADS);
+
 	//glNormal3i(0, -1, 0);
 	glVertex3f(-100.0f, 0.0f, -100.0f);
 	glVertex3f(-100.0f, 0.0f, 100.0f);
 	glVertex3f(100.0f, 0.0f, 100.0f);
 	glVertex3f(100.0f, 0.0f, -100.0f);
 	glEnd();
-	/*
-	// Draw 36 SnowMen
-	for (int i = -3; i < 3; i++)
-	for (int j = -3; j < 3; j++) {
-	glPushMatrix();
-	glTranslatef(i*10.0, 0, j * 10.0);
-	drawSnowMan();
-	glPopMatrix();
-	}
-	*/
+
+	// Draw SnowMen
+	int i, j;
+	for (i = -2; i < 3; i++)
+		for (j = -2; j < 3; j++)
+		{
+			if (i != 0 && j != 0)
+			{
+				glPushMatrix();
+				glTranslatef(i*10.0, 0, j * 10.0);
+				drawSnowMan();
+				glPopMatrix();
+			}
+		}
 }
 
 void drawUnits()
@@ -211,32 +217,22 @@ void lumina()
 void renderScene(void) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	lumina();
-
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
-
 	glLoadIdentity();
-
 	glClearColor(1.0, 1.0, 1.0, 0.0);
 	// Set the camera
-	if(camera == 1)
-		gluLookAt(xc + xcOffset, yc + ly, zc + zcOffset,    tank.getx(), tank.gety(), tank.getz(),       0, 1, 0);
+	if (camera == 1)
+		gluLookAt(xc + xcOffset, yc + ly, zc + zcOffset, tank.getx(), tank.gety(), tank.getz(), 0, 1, 0);
 	else
-		gluLookAt(racheta.getx()+ xc, racheta.gety() +3, racheta.getz() + zc, racheta.getx(), racheta.gety(), racheta.getz(), 0, 1, 0);
-
-	//gluLookAt(tank.cam.getDeUndeX() + xcOffset, tank.cam.getDeUndeY() + ly, tank.cam.getDeUndeZ() + zcOffset,
-	//	tank.cam.getUndeX(), tank.cam.getUndeY(), tank.cam.getUndeZ(),
-	//	0, 1, 0);
+		gluLookAt(racheta.getx() + xc, racheta.gety() + 3, racheta.getz() + zc, racheta.getx(), racheta.gety(), racheta.getz(), 0, 1, 0);
 	axeDeCoordonate();
 	drawUnits();
 	switch (rendermode) {
-
 	case IARNA:
 		iarna();
 		break;
-
 	case PRIMAVARA:
 		primavara();
 		break;
@@ -291,7 +287,7 @@ void processNormalKeys(unsigned char key, int x, int y)
 	case 'd':
 		if (camera == 1)
 		{
-			angle += 0.0175f;
+			angle -= 0.0175f;
 			tank.setRotireTank(tank.getRotireTank() - 1);
 		}
 		else
@@ -299,10 +295,9 @@ void processNormalKeys(unsigned char key, int x, int y)
 			racheta.setRotireGhiulea(racheta.getRotireGhiulea() - 2);
 
 		}
-		angle -= 0.0175f;
 		xc = 10 * sin(angle);
 		zc = 10 * cos(angle);
-	break;
+		break;
 	case 'l':
 		tank.setRotireTun(tank.getRotireTun() - 1);
 		if (tank.getRotireTun() == 360 || tank.getRotireTun() == -360)
@@ -325,15 +320,15 @@ void processNormalKeys(unsigned char key, int x, int y)
 		ghiulea[g] = giu;
 		g++;
 	}
-		break;
+	break;
 	case 'r':
 	{
 		Racheta r(tank.getx(), tank.gety(), tank.getz(), tank.getRotireTun(), tank.getInclinareTun());
 		racheta = r;
 		break;
 	}
-	
-		break;
+
+	break;
 	case '1':
 		camera = 1;
 		break;
@@ -371,21 +366,19 @@ void processSpecialKeys(int key, int xx, int yy) {
 
 	}
 }
-
 int main(int argc, char **argv) {
-
-	// init GLUT and create window
 	int ok = 0;
-	if(ok==0)
+	if (ok == 0)
 	{
-		
+
 		ok = 1;
 	}
+	// init GLUT and create window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(320, 320);
-	glutCreateWindow("Lighthouse3D - GLUT Tutorial");
+	glutCreateWindow("Tancul cu rachete");
 
 	// register callbacks
 	glutDisplayFunc(renderScene);
@@ -394,8 +387,11 @@ int main(int argc, char **argv) {
 	glutSpecialFunc(processSpecialKeys);
 
 	// OpenGL init
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
 
+	//Right Click Menu
 	glutCreateMenu(menu);
 	glutAddMenuEntry("Iarna", IARNA);
 	glutAddMenuEntry("Primavara", PRIMAVARA);
